@@ -10,12 +10,17 @@ import { AuthContext } from '../../contexts/AuthContext';
 import getValidationErrors from '../../utils/getValidationErrors';
 import { Container, Content, Background } from './styles';
 
+interface SignInFormData {
+  email: string;
+  password: string;
+}
+
 const SignIn: React.FC = () => {
   const { signIn } = useContext(AuthContext);
 
   const formRef = useRef<FormHandles>(null);
 
-  const handleSubmit = useCallback(async (data: object) => {
+  const handleSubmit = useCallback(async (data: SignInFormData) => {
     try {
       formRef.current?.setErrors({});
 
@@ -28,7 +33,12 @@ const SignIn: React.FC = () => {
 
       await schema.validate(data, { abortEarly: false });
 
-      signIn();
+      const credentials = {
+        email: data.email,
+        password: data.password,
+      };
+
+      signIn(credentials);
     } catch (err) {
       const errors = getValidationErrors(err as Yup.ValidationError);
 
