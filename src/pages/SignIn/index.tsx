@@ -6,7 +6,8 @@ import * as Yup from 'yup';
 import logoImg from '../../assets/logo.svg';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
-import { useAuth } from '../../hooks/AuthContext';
+import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
 
 import getValidationErrors from '../../utils/getValidationErrors';
 import { Container, Content, Background } from './styles';
@@ -18,6 +19,7 @@ interface SignInFormData {
 
 const SignIn: React.FC = () => {
   const { user, signIn } = useAuth();
+  const { addToast } = useToast();
 
   console.log(user);
 
@@ -42,14 +44,22 @@ const SignIn: React.FC = () => {
           password: data.password,
         };
 
-        signIn(credentials);
+        await signIn(credentials);
       } catch (err) {
-        const errors = getValidationErrors(err as Yup.ValidationError);
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err as Yup.ValidationError);
 
-        formRef.current?.setErrors(errors);
+          formRef.current?.setErrors(errors);
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Erro na autenticação',
+          description: 'Ocorreu um erro ao fazer login, cheque as credenciais',
+        });
       }
     },
-    [signIn],
+    [signIn, addToast],
   );
 
   return (
