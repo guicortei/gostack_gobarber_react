@@ -24,8 +24,6 @@ const SignIn: React.FC = () => {
 
   const history = useHistory();
 
-  console.log(user);
-
   const formRef = useRef<FormHandles>(null);
 
   const handleSubmit = useCallback(
